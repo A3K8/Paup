@@ -1,0 +1,48 @@
+﻿@using Pp.Models
+@model Proizvodi
+@{
+    ViewBag.Title = "Detalji";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Detalji o proizvodu</h2>
+
+
+
+<div class="row">
+    <div class="col-md-2">
+        <strong>Id:</strong>
+    </div>
+    <div class="col-md-10">
+        @Model.Id <br />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <strong>Vrsta:</strong>
+    </div>
+    <div class="col-md-10">
+        @Model.Vrsta <br />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <strong>Materijal:</strong>
+    </div>
+    <div class="col-md-10">
+        @Model.Materijal <br />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <strong>Cijena:</strong>
+    </div>
+    <div class="col-md-10">
+        @Model.Cijena <br />
+    </div>
+</div>
+
+@Html.ActionLink("Povratak na popis proizvoda", "Popis", "Proizvodi", null, new { @class = "btn btn-primary btn-sm" })

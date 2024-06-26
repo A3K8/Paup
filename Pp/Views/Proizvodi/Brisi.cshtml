@@ -1,0 +1,29 @@
+﻿﻿@using Pp.Models
+@model Proizvodi
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+
+<strong>Jeste li sigurni da želite izbrisati proizvod @Model.Vrsta (Materijal: @Model.Materijal) ? </strong>
+
+<br />
+<br />
+
+@using (Html.BeginForm("Brisi", "Proizvodi"))
+{
+    @Html.AntiForgeryToken();
+
+    <button type="submit" class="btn btn-danger">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Izbriši proizvod
+    </button>
+
+    <br />
+    <br />
+
+    @Html.ActionLink("Odustani", "Popis");
+}

@@ -1,0 +1,63 @@
+﻿@using Pp.Models
+@model List<Proizvodi>
+@{
+
+    ViewBag.Title = "Popis proizvoda";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //bool novi = ViewBag.Novi ?? false;
+}
+
+<h2>Popis</h2>
+<a href="@Url.Action("Azuriraj", "Proizvodi")" class="btn btn-success">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Kreiraj novi proizvod
+</a>
+<br />
+<br />
+
+@using (Html.BeginForm("Popis", "Proizvodi", FormMethod.Get, new { @class = "form-inline" }))
+{
+    <div class="form-group">
+        <label class="radio-inline">
+            @Html.RadioButton("materijal", "PVC") PVC
+        </label>
+        <label class="radio-inline">
+            @Html.RadioButton("materijal", "ALU") ALU
+        </label>
+        <label class="radio-inline">
+            @Html.RadioButton("materijal", "") Svi
+        </label>
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Traži
+    </button>
+}
+
+
+
+<table class="table table-striped">
+    <tr>
+        <th>Id</th>
+        <th>Vrsta</th>
+        <th>Materijal</th>
+        <th>Cijena</th>
+        <th>Akcije</th>
+
+
+    </tr>
+    @foreach (var proivodi in Model)
+    {
+        <tr>
+            <td>@proivodi.Id</td>
+            <td>@proivodi.Vrsta</td>
+            <td>@proivodi.Materijal</td>
+            <td>@proivodi.Cijena</td>
+            <td>
+                @Html.ActionLink("Detalji", "Detalji", new { id = proivodi.Id }, new { @class = "btn btn-info btn-sm" })
+                @Html.ActionLink("Ažuriraj", "Azuriraj", new { id = proivodi.Id }, new { @class = "btn btn-warning btn-sm" })
+                @Html.ActionLink("Izbriši", "Brisi", new { id = proivodi.Id }, new { @class = "btn btn-danger btn-sm" })
+            </td>
+        </tr>
+    }
+
+</table>
+}

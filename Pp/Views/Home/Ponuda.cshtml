@@ -1,0 +1,152 @@
+﻿@{
+    ViewBag.Title = "Zatraži ponudu";
+}
+
+<h2>Zatraži ponudu</h2>
+
+<form id="windowForm" method="post" action="/Ponuda/GeneratePdf">
+    <div class="form-group">
+        <label for="selection">Odaberite prozore, vrata ili oboje:</label>
+        <select class="form-control" id="selection" name="selection" onchange="updateForm()">
+            <option value="">Odaberite</option>
+            <option value="prozori">Prozori</option>
+            <option value="vrata">Vrata</option>
+            <option value="oboje">Oboje</option>
+        </select>
+    </div>
+    <div class="form-group" id="windowQuantityGroup" style="display: none;">
+        <label for="windowQuantity">Količina prozora:</label>
+        <input type="number" class="form-control" id="windowQuantity" name="windowQuantity">
+    </div>
+    <div class="form-group" id="doorQuantityGroup" style="display: none;">
+        <label for="doorQuantity">Količina vrata:</label>
+        <input type="number" class="form-control" id="doorQuantity" name="doorQuantity">
+    </div>
+    <div id="windowDetailsContainer"></div>
+    <div id="doorDetailsContainer"></div>
+    <div class="form-group">
+        <label for="customMessage">Vlastita poruka:</label>
+        <textarea class="form-control" id="customMessage" name="customMessage" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="fullName">Ime i prezime:</label>
+        <input type="text" class="form-control" id="fullName" name="fullName">
+    </div>
+    <div class="form-group">
+        <label for="email">E-mail adresa:</label>
+        <input type="email" class="form-control" id="email" name="email">
+    </div>
+    <button type="submit" class="btn btn-primary">Potvrdi odabir</button>
+</form>
+
+<script>
+    function updateForm() {
+        let selection = document.getElementById('selection').value;
+        document.getElementById('windowQuantityGroup').style.display = selection === 'prozori' || selection === 'oboje' ? 'block' : 'none';
+        document.getElementById('doorQuantityGroup').style.display = selection === 'vrata' || selection === 'oboje' ? 'block' : 'none';
+        updateWindowDetails();
+        updateDoorDetails();
+    }
+
+    document.getElementById('windowQuantity').addEventListener('input', updateWindowDetails);
+    document.getElementById('doorQuantity').addEventListener('input', updateDoorDetails);
+
+    function createDetailFields(type, index) {
+        return `
+            <tr>
+                <td>${type.charAt(0).toUpperCase() + type.slice(1)} ${index}</td>
+                <td><input type="number" class="form-control" id="${type}Width${index}" name="${type}Width${index}" placeholder="Širina (cm)"></td>
+                <td><input type="number" class="form-control" id="${type}Height${index}" name="${type}Height${index}" placeholder="Visina (cm)"></td>
+                <td>
+                    <select class="form-control" id="${type}Material${index}" name="${type}Material${index}" onchange="updateMaterialType('${type}', ${index})">
+                        <option value="aluminij">Aluminij</option>
+                        <option value="plastika">Plastika</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-control" id="${type}Color${index}" name="${type}Color${index}">
+                        <option value="bijela">Bijela</option>
+                        <option value="crna">Crna</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-control" id="${type}Type${index}" name="${type}Type${index}">
+                        <!-- Opcije će biti dinamički dodane putem JavaScript-a -->
+                    </select>
+                </td>
+                ${type === 'prozor' ? `
+                    <td>
+                        <select class="form-control" id="${type}Wing${index}" name="${type}Wing${index}">
+                            <option value="jednokrilni">Jednokrilni</option>
+                            <option value="dvokrilni">Dvokrilni</option>
+                            <option value="trokrilni">Trokrilni</option>
+                        </select>
+                    </td>
+                ` : ''}
+            </tr>
+        `;
+    }
+
+    function updateMaterialType(type, index) {
+        let materialSelect = document.getElementById(`${type}Material${index}`);
+        let typeSelect = document.getElementById(`${type}Type${index}`);
+        let selectedMaterial = materialSelect.value;
+
+        typeSelect.innerHTML = '';
+
+        if (selectedMaterial === 'plastika') {
+            typeSelect.innerHTML = `
+                <option value="salamanderBlue">Salamander BluEvolution</option>
+                <option value="salamanderGreen">Salamander GreenEvolution</option>
+                <option value="salamanderStream">Salamander StreamLine</option>
+            `;
+        } else if (selectedMaterial === 'aluminij') {
+            typeSelect.innerHTML = `
+                <option value="fealTermo65">Feal Termo 65</option>
+                <option value="fealTermo85">Feal Termo 85</option>
+                <option value="fealTermo120">Feal Termo 120</option>
+                <option value="fealTermo150">Feal Termo 150</option>
+            `;
+        } else {
+            typeSelect.innerHTML = '';
+        }
+    }
+
+    function updateDetails(quantity, containerId, type) {
+        let container = document.getElementById(containerId);
+        container.innerHTML = '';
+        if (quantity > 0) {
+            container.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>${type.charAt(0).toUpperCase() + type.slice(1)}</th>
+                            <th>Širina (cm)</th>
+                            <th>Visina (cm)</th>
+                            <th>Materijal</th>
+                            <th>Boja</th>
+                            <th>Vrsta</th>
+                            ${type === 'prozor' ? '<th>Vrsta krila</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Array.from({ length: quantity }, (_, i) => createDetailFields(type, i + 1)).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        for (let i = 1; i <= quantity; i++) {
+            updateMaterialType(type, i);
+        }
+    }
+
+    function updateWindowDetails() {
+        let quantity = document.getElementById('windowQuantity').value;
+        updateDetails(quantity, 'windowDetailsContainer', 'prozor');
+    }
+
+    function updateDoorDetails() {
+        let quantity = document.getElementById('doorQuantity').value;
+        updateDetails(quantity, 'doorDetailsContainer', 'vrata');
+    }
+</script>
