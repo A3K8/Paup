@@ -6,6 +6,7 @@ using System.Web;
 using System.Net;
 using System.Web.Mvc;
 using System.Data.Entity;
+using Pp.Reports;
 
 namespace Pp.Controllers
 {
@@ -144,6 +145,35 @@ namespace Pp.Controllers
             bazaPodataka.SaveChanges();
 
             return View("BrisiStatus");
+        }
+
+        public ActionResult IspisPDF(string vrsta, string materijal)
+        {
+            var proizvodi = bazaPodataka.PopisProizvoda.ToList();
+
+           
+            if (!string.IsNullOrWhiteSpace(vrsta))
+            {
+                proizvodi = proizvodi.Where(x => x.Vrsta == vrsta).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(materijal))
+            {
+                proizvodi = proizvodi.Where(x => x.Materijal == materijal).ToList();
+            }
+
+            if (proizvodi.Count == 0)
+            {
+                ViewBag.Poruka = "Nema rezultata pretraživanja.";
+            }
+            else
+            {
+                ViewBag.Poruka = string.Empty;
+            }
+
+            ProizvodiReport proizvodiReport = new ProizvodiReport();
+            proizvodiReport.ListaProizvoda(proizvodi);
+
+            return File(proizvodiReport.Podaci, System.Net.Mime.MediaTypeNames.Application.Pdf, "PopisProizvoda.pdf");
         }
     }
 }
